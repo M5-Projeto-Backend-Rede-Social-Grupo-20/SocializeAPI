@@ -15,4 +15,3 @@ class User(AbstractUser):
         on_delete=models.CASCADE,
         null=True,
     )
-    email = models.EmailField(max_length=255)
