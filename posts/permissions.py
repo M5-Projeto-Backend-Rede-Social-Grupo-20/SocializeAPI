@@ -5,5 +5,5 @@ from .models import Post
 class IsPostOwnerOrReadOnly(BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method == "GET":
-            return True
+            return obj.access == "public"
         return obj.posted_by == request.user
