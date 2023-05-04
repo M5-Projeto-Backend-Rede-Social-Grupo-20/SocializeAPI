@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "socializeapi"
+version = "0.1.0"
+description = "SocializeAPI: a social network API"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+djangorestframework-simplejwt = "^5.2.2"
+python-dotenv = "^1.0.0"
+psycopg2-binary = "^2.9.6"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.3.0"
+ipdb = "^0.13.13"
+pycodestyle = "^2.10.0"
+Faker = "^15.3.4"
+factory-boy = "^3.2.1"
+model-bakery = "^1.9.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
