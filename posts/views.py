@@ -1,15 +1,15 @@
 from django.shortcuts import render
-from rest_framework.generics import ListCreateAPIView, RetrieveDestroyAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from .serializers import PostSerializer
 from .models import Post
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from .permissions import IsPostOwnerOrReadOnly
 
 
 class PostView(ListCreateAPIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     queryset = Post.objects.all()
     serializer_class = PostSerializer
@@ -18,7 +18,7 @@ class PostView(ListCreateAPIView):
         return serializer.save(posted_by=self.request.user)
 
 
-class PostDetailView(RetrieveDestroyAPIView):
+class PostDetailView(RetrieveUpdateDestroyAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsPostOwnerOrReadOnly]
 
