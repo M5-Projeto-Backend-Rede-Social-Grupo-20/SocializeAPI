@@ -24,3 +24,6 @@ class PostDetailView(RetrieveUpdateDestroyAPIView):
 
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+
+    def get_queryset(self):
+        return Post.objects.filter(access="public")
