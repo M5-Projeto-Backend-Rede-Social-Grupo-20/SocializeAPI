@@ -7,7 +7,9 @@ class AccessChoices(models.TextChoices):
 
 
 class Post(models.Model):
-    access = models.CharField(choices=AccessChoices.choices, max_length=7)
+    access = models.CharField(
+        choices=AccessChoices.choices, max_length=7, default=AccessChoices.PUBLIC
+    )
     text = models.TextField(max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
     posted_by = models.ForeignKey(
