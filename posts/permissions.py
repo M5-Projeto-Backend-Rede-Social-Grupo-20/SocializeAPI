@@ -2,8 +2,8 @@ from rest_framework.permissions import BasePermission
 from .models import Post
 
 
-class IsPostOwnerOrReadOnly:
-    def has_permission(self, request, view, obj: Post):
+class IsPostOwnerOrReadOnly(BasePermission):
+    def has_object_permission(self, request, view, obj):
         if request.method == "GET":
             return True
         return obj.posted_by == request.user

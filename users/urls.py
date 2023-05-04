@@ -6,4 +6,5 @@ urlpatterns = [
     path("user/", UserView.as_view()),
     path("user/<int:id>/", UserDetailView.as_view()),
     path("user/login/", jwt_views.TokenObtainPairView.as_view()),
+    path("user/refresh/", jwt_views.TokenRefreshView.as_view()),
 ]

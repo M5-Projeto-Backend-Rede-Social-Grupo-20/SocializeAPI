@@ -20,7 +20,7 @@ class PostView(ListCreateAPIView):
 
 class PostDetailView(RetrieveDestroyAPIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = []
+    permission_classes = [IsPostOwnerOrReadOnly]
 
     queryset = Post.objects.all()
     serializer_class = PostSerializer
