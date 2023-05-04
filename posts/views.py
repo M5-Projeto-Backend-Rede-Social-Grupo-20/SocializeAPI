@@ -4,6 +4,7 @@ from .serializers import PostSerializer
 from .models import Post
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
+from .permissions import IsPostOwnerOrReadOnly
 
 
 class PostView(ListCreateAPIView):
@@ -18,5 +19,8 @@ class PostView(ListCreateAPIView):
 
 
 class PostDetailView(RetrieveDestroyAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = []
+
     queryset = Post.objects.all()
     serializer_class = PostSerializer
