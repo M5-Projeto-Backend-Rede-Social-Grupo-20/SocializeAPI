@@ -13,7 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data: dict) -> User:
         return User.objects.create_user(**validated_data)
-    
+
     class Meta:
         model = User
         fields = "__all__"
