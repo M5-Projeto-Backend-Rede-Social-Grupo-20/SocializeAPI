@@ -17,6 +17,9 @@ class PostView(ListCreateAPIView):
     def perform_create(self, serializer):
         return serializer.save(posted_by=self.request.user)
 
+    def get_queryset(self):
+        return Post.objects.filter(access="public")
+
 
 class PostDetailView(RetrieveUpdateDestroyAPIView):
     authentication_classes = [JWTAuthentication]
@@ -24,6 +27,3 @@ class PostDetailView(RetrieveUpdateDestroyAPIView):
 
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-
-    def get_queryset(self):
-        return Post.objects.filter(access="public")
