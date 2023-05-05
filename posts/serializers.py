@@ -1,11 +1,13 @@
 from rest_framework import serializers
 from .models import Post, AccessChoices
 from users.serializers import UserSerializer
+from comments.serializers import CommentSerializer
 
 
 class PostSerializer(serializers.ModelSerializer):
     access = serializers.ChoiceField(choices=AccessChoices.choices)
     posted_by = UserSerializer(read_only=True)
+    comments = CommentSerializer(read_only=True, many=True)
 
     class Meta:
         model = Post
