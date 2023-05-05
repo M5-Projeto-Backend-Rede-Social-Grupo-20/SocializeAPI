@@ -7,10 +7,12 @@ from rest_framework.generics import (
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from django.shortcuts import get_object_or_404
+from rest_framework.response import Response
+from rest_framework import status
 
 from .permissions import IsPostOwnerOrReadOnly
-from .models import Post, Comment
-from .serializers import PostSerializer, CommentSerializer
+from .models import Post, Comment, Like
+from .serializers import PostSerializer, CommentSerializer, LikeSerializer
 
 
 class PostView(ListCreateAPIView):
@@ -45,3 +47,23 @@ class CommentView(CreateAPIView):
     def perform_create(self, serializer):
         post = get_object_or_404(Post, id=self.kwargs["post_id"])
         return serializer.save(post=post, commented_by=self.request.user)
+
+
+class LikeView(CreateAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    queryset = Like.objects.all()
+    serializer_class = LikeSerializer
+
+    def perform_create(self, serializer):
+        post = get_object_or_404(Post, id=self.kwargs["post_id"])
+        like = Like.objects.filter(liked_by_id=self.request.user.id, posted_in=post)
+
+        if like.exists():
+            return Response(
+                {"detail": "This post was already liked"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer.save(liked_by=self.request.user, posted_in=post)
