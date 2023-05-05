@@ -43,6 +43,6 @@ class Like(models.Model):
     liked_by = models.ForeignKey(
         "users.user", related_name="likes", on_delete=models.CASCADE
     )
-    posted_in = models.ForeignKey(Post, related_name="likes", on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, related_name="likes", on_delete=models.CASCADE)
 
     created_at = models.DateTimeField(auto_now_add=True)

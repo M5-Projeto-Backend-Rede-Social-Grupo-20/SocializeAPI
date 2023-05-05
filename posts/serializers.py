@@ -46,12 +46,12 @@ class CommentSerializer(serializers.ModelSerializer):
             "id",
             "content",
             "commented_by",
-            "posted_in",
+            "post",
             "created_at",
         ]
         read_only_fields = [
             "id",
             "commented_by",
             "created_at",
-            "posted_in",
+            "post",
         ]
