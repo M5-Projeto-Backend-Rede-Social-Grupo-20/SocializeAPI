@@ -24,21 +24,21 @@ class PostSerializer(serializers.ModelSerializer):
 
 class LikeSerializer(serializers.ModelSerializer):
     liked_by = UserSerializer(read_only=True)
-    posted_in = PostSerializer(read_only=True)
+    post = PostSerializer(read_only=True)
 
     class Meta:
         model = Like
         fields = (
             "id",
             "liked_by",
-            "posted_in",
+            "post",
             "created_at",
         )
 
 
 class CommentSerializer(serializers.ModelSerializer):
     commented_by = UserSerializer(read_only=True)
-    posted_in = PostSerializer(read_only=True)
+    post = PostSerializer(read_only=True)
 
     class Meta:
         model = Comment
