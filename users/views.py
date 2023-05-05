@@ -1,53 +1,36 @@
-from django.shortcuts import render
-from .models import User
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework import generics, permissions, status
+from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.permissions import IsAuthenticated
+
+from .models import User
 from .serializers import UserSerializer
-from django.shortcuts import get_object_or_404
 
 
-class UserView(ListCreateAPIView):
+class UserListView(generics.ListCreateAPIView):
+    permission_classes = [permissions.AllowAny]
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
 
-class UserDetailView(RetrieveUpdateDestroyAPIView):
+class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
     lookup_url_kwarg = "id"
 
-# Create your views here.
+    def get_serializer_context(self):
+        return {"request": self.request}
 
-# class UserView(RetrieveModelMixin, CreateModelMixin, GenericAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
+    def patch(self, request, *args, **kwargs):
+        user = self.get_object()
+        serializer = self.get_serializer(user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
-#     lookup_url_kwarg = "id"
-
-#     def get(self, request, *args, **kwargs):
-#         return self.retrieve(request, *args, **kwargs)
-    
-#     def post(self, request, *args, **kwargs):
-#         return self.create(request, *args, **kwargs)
-
-
-# class UserDetailView(ListModelMixin, UpdateModelMixin, DestroyModelMixin, GenericAPIView):
-#     authentication_classes = [JWTAuthentication]
-#     permission_classes = [IsAuthenticated]
-
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
-#     lookup_url_kwarg = "id"
-
-#     def get(self, request, *args, **kwargs):
-#         return self.list(request, *args, **kwargs)
-
-#     def update(self, request, *args, **kwargs):
-#         return self.update(request, *args, **kwargs)
-
-#     def destroy(self, request, *args, **kwargs):
-#         return self.destroy(request, *args, **kwargs)
+    def delete(self, request, *args, **kwargs):
+        user = self.get_object()
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
