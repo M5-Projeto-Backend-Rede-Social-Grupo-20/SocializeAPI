@@ -1,6 +1,7 @@
 from django.db import models
 import uuid
 
+
 class AccessChoices(models.TextChoices):
     PRIVATE = "private"
     PUBLIC = "public"
@@ -29,8 +30,9 @@ class Comment(models.Model):
     commented_by = models.ForeignKey(
         "users.user", related_name="comments", on_delete=models.CASCADE
     )
-    posted_in = models.ForeignKey(Post, related_name="comments", on_delete=models.CASCADE)
-
+    posted_in = models.ForeignKey(
+        Post, related_name="comments", on_delete=models.CASCADE
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
 

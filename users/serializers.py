@@ -21,11 +21,12 @@ class UserSerializer(serializers.ModelSerializer):
             "gender",
             "city",
             "created_at",
-            "updated_at"
+            "updated_at",
         ]
         read_only_fields = ["id", "created_at", "updated_at"]
         extra_kwargs = {
             "email": {"required": True},
+            "username": {"required": True},
             "password": {"required": True, "write_only": True},
             "first_name": {"required": True},
             "last_name": {"required": True},
@@ -38,7 +39,7 @@ class UserSerializer(serializers.ModelSerializer):
     def validate_username(self, username):
         if User.objects.filter(username=username).exists():
             raise ValidationError("A user with that username already exists.")
-        return username    
+        return username
 
     def validate_email(self, email):
         if User.objects.filter(email=email).exists():
