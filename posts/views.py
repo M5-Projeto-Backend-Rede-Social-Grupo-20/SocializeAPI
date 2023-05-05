@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateDestroyAPIView,
+    RetrieveDestroyAPIView,
     CreateAPIView,
 )
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -12,7 +13,7 @@ from rest_framework.permissions import (
 )
 from django.shortcuts import get_object_or_404
 
-from .permissions import IsPostOwnerOrReadOnly
+from .permissions import IsPostOwner, IsCommentOwner
 from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
 
@@ -33,7 +34,7 @@ class PostView(ListCreateAPIView):
 
 class PostDetailView(RetrieveUpdateDestroyAPIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsPostOwnerOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsPostOwner]
 
     queryset = Post.objects.all()
     serializer_class = PostSerializer
@@ -54,6 +55,9 @@ class CommentView(ListCreateAPIView):
         return serializer.save(post=post, commented_by=self.request.user)
 
 
-class CommentDetailView(RetrieveUpdateDestroyAPIView):
+class CommentDetailView(RetrieveDestroyAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsCommentOwner]
+
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
