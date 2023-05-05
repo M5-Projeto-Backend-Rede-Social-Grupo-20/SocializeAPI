@@ -1,5 +1,5 @@
 """
-URL configuration for _socialize_api project.
+URL configuration for socialize_api project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.2/topics/http/urls/
@@ -21,4 +21,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("users.urls")),
     path("api/", include("posts.urls")),
+    path("api/", include("comments.urls")),
 ]
