@@ -44,7 +44,7 @@ class CommentView(CreateAPIView):
 
     def perform_create(self, serializer):
         post = get_object_or_404(Post, id=self.kwargs["post_id"])
-        return serializer.save(posted_in=post, commented_by=self.request.user)
+        return serializer.save(post=post, commented_by=self.request.user)
 
 
 class CommentDetailView(RetrieveUpdateDestroyAPIView):
