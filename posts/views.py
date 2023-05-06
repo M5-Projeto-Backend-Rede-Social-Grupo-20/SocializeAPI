@@ -4,6 +4,7 @@ from rest_framework.generics import (
     RetrieveUpdateDestroyAPIView,
     RetrieveDestroyAPIView,
     CreateAPIView,
+    DestroyAPIView,
 )
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import (
@@ -12,7 +13,13 @@ from rest_framework.permissions import (
     IsAuthenticatedOrReadOnly,
 )
 from django.shortcuts import get_object_or_404
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.exceptions import NotFound
 
+from .permissions import IsPostOwnerOrReadOnly
+from .models import Post, Comment, Like
+from .serializers import PostSerializer, CommentSerializer, LikeSerializer
 from .permissions import IsPostOwner, IsCommentOwner
 from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
@@ -55,6 +62,42 @@ class CommentView(ListCreateAPIView):
         return serializer.save(post=post, commented_by=self.request.user)
 
 
+class LikeView(CreateAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    queryset = Like.objects.all()
+    serializer_class = LikeSerializer
+
+    def perform_create(self, serializer):
+        post = get_object_or_404(Post, id=self.kwargs["post_id"])
+        like = Like.objects.filter(liked_by_id=self.request.user.id, posted_in=post)
+
+        if like.exists():
+            return Response(
+                {"detail": "This post was already liked"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer.save(liked_by=self.request.user, posted_in=post)
+
+
+class UnlikeView(DestroyAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    queryset = Like.objects.all()
+    serializer_class = LikeSerializer
+
+    def get_object(self):
+        try:
+            like = Like.objects.get(
+                posted_in_id=self.kwargs["post_id"], liked_by=self.request.user
+            )
+        except Like.DoesNotExist:
+            raise NotFound("This post was not liked")
+
+        return like
 class CommentDetailView(RetrieveDestroyAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly, IsCommentOwner]
