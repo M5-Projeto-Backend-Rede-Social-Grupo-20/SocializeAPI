@@ -3,12 +3,14 @@ from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateDestroyAPIView,
     CreateAPIView,
+    DestroyAPIView,
 )
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.exceptions import NotFound
 
 from .permissions import IsPostOwnerOrReadOnly
 from .models import Post, Comment, Like
@@ -67,3 +69,21 @@ class LikeView(CreateAPIView):
             )
 
         serializer.save(liked_by=self.request.user, posted_in=post)
+
+
+class UnlikeView(DestroyAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    queryset = Like.objects.all()
+    serializer_class = LikeSerializer
+
+    def get_object(self):
+        try:
+            like = Like.objects.get(
+                posted_in_id=self.kwargs["post_id"], liked_by=self.request.user
+            )
+        except Like.DoesNotExist:
+            raise NotFound("This post was not liked")
+
+        return like
