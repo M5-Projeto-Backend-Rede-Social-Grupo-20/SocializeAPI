@@ -1,13 +1,11 @@
 from rest_framework import serializers
 
-from users.serializers import UserSerializer
+from users.serializers import ShortUserSerializer
 from .models import Post, AccessChoices, Like, Comment
+from django.forms.models import model_to_dict
 
 
-class PostSerializer(serializers.ModelSerializer):
-    access = serializers.ChoiceField(choices=AccessChoices.choices)
-    posted_by = UserSerializer(read_only=True)
-
+class ShortPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = (
@@ -15,16 +13,13 @@ class PostSerializer(serializers.ModelSerializer):
             "posted_by",
             "content",
             "access",
-            "created_at",
-            "comments",
-            "likes",
         )
         read_only_fields = ("id", "created_at", "posted_by", "comments", "likes")
 
 
 class LikeSerializer(serializers.ModelSerializer):
-    liked_by = UserSerializer(read_only=True)
-    post = PostSerializer(read_only=True)
+    liked_by = ShortUserSerializer(read_only=True)
+    post = ShortPostSerializer(read_only=True)
 
     class Meta:
         model = Like
@@ -37,8 +32,8 @@ class LikeSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    commented_by = UserSerializer(read_only=True)
-    post = PostSerializer(read_only=True)
+    commented_by = ShortUserSerializer(read_only=True)
+    post = ShortPostSerializer(read_only=True)
 
     class Meta:
         model = Comment
@@ -55,3 +50,19 @@ class CommentSerializer(serializers.ModelSerializer):
             "created_at",
             "post",
         ]
+
+
+class PostSerializer(serializers.ModelSerializer):
+    access = serializers.ChoiceField(choices=AccessChoices.choices)
+    posted_by = ShortUserSerializer(read_only=True)
+
+    class Meta:
+        model = Post
+        fields = (
+            "id",
+            "posted_by",
+            "content",
+            "access",
+            "created_at",
+        )
+        read_only_fields = ("id", "created_at", "posted_by", "comments", "likes")

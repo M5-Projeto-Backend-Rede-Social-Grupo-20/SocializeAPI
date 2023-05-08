@@ -3,7 +3,6 @@ from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateDestroyAPIView,
     RetrieveDestroyAPIView,
-    CreateAPIView,
     DestroyAPIView,
 )
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -17,7 +16,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import NotFound
 
-from .permissions import IsPostOwnerOrReadOnly
+from .permissions import IsPostOwner
 from .models import Post, Comment, Like
 from .serializers import PostSerializer, CommentSerializer, LikeSerializer
 from .permissions import IsPostOwner, IsCommentOwner
@@ -62,7 +61,7 @@ class CommentView(ListCreateAPIView):
         return serializer.save(post=post, commented_by=self.request.user)
 
 
-class LikeView(CreateAPIView):
+class LikeView(ListCreateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
 
@@ -98,6 +97,8 @@ class UnlikeView(DestroyAPIView):
             raise NotFound("This post was not liked")
 
         return like
+
+
 class CommentDetailView(RetrieveDestroyAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly, IsCommentOwner]
