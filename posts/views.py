@@ -71,7 +71,7 @@ class LikeView(CreateAPIView):
 
     def perform_create(self, serializer):
         post = get_object_or_404(Post, id=self.kwargs["post_id"])
-        like = Like.objects.filter(liked_by_id=self.request.user.id, posted_in=post)
+        like = Like.objects.filter(liked_by_id=self.request.user.id, post=post)
 
         if like.exists():
             return Response(
@@ -79,7 +79,7 @@ class LikeView(CreateAPIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        serializer.save(liked_by=self.request.user, posted_in=post)
+        serializer.save(liked_by=self.request.user, post=post)
 
 
 class UnlikeView(DestroyAPIView):
@@ -92,7 +92,7 @@ class UnlikeView(DestroyAPIView):
     def get_object(self):
         try:
             like = Like.objects.get(
-                posted_in_id=self.kwargs["post_id"], liked_by=self.request.user
+                post_id=self.kwargs["post_id"], liked_by=self.request.user
             )
         except Like.DoesNotExist:
             raise NotFound("This post was not liked")
