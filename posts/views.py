@@ -16,12 +16,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import NotFound
 
-from .permissions import IsPostOwner
+from .permissions import IsPostOwnerOrReadOnly
 from .models import Post, Comment, Like
 from .serializers import PostSerializer, CommentSerializer, LikeSerializer
 from .permissions import IsPostOwner, IsCommentOwner
-from .models import Post, Comment
-from .serializers import PostSerializer, CommentSerializer
 
 
 class PostView(ListCreateAPIView):
