@@ -17,12 +17,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import NotFound
 
-from .permissions import IsPostOwnerOrReadOnly
+# from .permissions import IsPostOwnerOrReadOnly
 from .models import Post, Comment, Like
 from .serializers import PostSerializer, CommentSerializer, LikeSerializer
 from .permissions import IsPostOwner, IsCommentOwner
-from .models import Post, Comment
-from .serializers import PostSerializer, CommentSerializer
 
 
 class PostView(ListCreateAPIView):
@@ -98,6 +96,8 @@ class UnlikeView(DestroyAPIView):
             raise NotFound("This post was not liked")
 
         return like
+    
+
 class CommentDetailView(RetrieveDestroyAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly, IsCommentOwner]

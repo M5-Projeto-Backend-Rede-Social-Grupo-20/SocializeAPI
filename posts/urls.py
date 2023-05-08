@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import PostView, PostDetailView, CommentView, LikeView, UnlikeView, CommentDetailView
+from .views import (PostView, PostDetailView, CommentView,
+                    LikeView, UnlikeView, CommentDetailView)
 
 urlpatterns = [
     path("posts/", PostView.as_view()),
