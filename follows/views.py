@@ -1,7 +1,5 @@
-from django.forms import ValidationError
-from rest_framework import generics, mixins, views
+from rest_framework import generics
 from rest_framework import permissions
-from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import serializers
@@ -20,8 +18,8 @@ class FollowSelfView(generics.ListAPIView):
         user = self.request.user
         follows_type = self.request.GET.get("type")
         if follows_type == "following":
-            return Follow.objects.filter(from_user=user)
-        return Follow.objects.filter(to_user=user)
+            return user.following.all()
+        return user.followers.all()
 
 
 class FollowView(generics.ListCreateAPIView, generics.DestroyAPIView):
@@ -37,10 +35,10 @@ class FollowView(generics.ListCreateAPIView, generics.DestroyAPIView):
         user = self.get_object()
         follows_type = self.request.GET.get("type")
         if follows_type == "following":
-            return Follow.objects.filter(from_user=user)
+            return user.followings.all()
         elif follows_type == "check":
-            return Follow.objects.filter(from_user=self.request.user, to_user=user)
-        return Follow.objects.filter(to_user=user)
+            return user.followers.all().filter(from_user=self.request.user)
+        return user.followers.all()
 
     def perform_create(self, serializer):
         user = self.get_object()
@@ -48,7 +46,7 @@ class FollowView(generics.ListCreateAPIView, generics.DestroyAPIView):
 
     def perform_destroy(self, instance):
         user = self.get_object()
-        follow = Follow.objects.filter(from_user=self.request.user, to_user=user)
+        follow = user.followers.filter(from_user=self.request.user).first()
         if not follow:
             raise serializers.ValidationError("You not follow this user.")
         follow.delete()

@@ -2,7 +2,6 @@ from rest_framework import serializers
 from django.shortcuts import get_object_or_404
 
 from .models import Follow
-from users.models import User
 from users.serializers import UserSerializer
 
 
@@ -16,11 +15,14 @@ class FollowSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "created_at"]
 
     def create(self, validated_data):
-        if validated_data["from_user"] == validated_data["to_user"]:
+        from_user = validated_data["from_user"]
+        to_user = validated_data["to_user"]
+
+        if from_user == to_user:
             raise serializers.ValidationError("You cannot follow yourself.")
-        follow = Follow.objects.filter(
-            from_user=validated_data["from_user"], to_user=validated_data["to_user"]
-        ).first()
+
+        follow = to_user.followers.filter(from_user=from_user).first()
         if follow:
             raise serializers.ValidationError("You already followed this user.")
+
         return Follow.objects.create(**validated_data)
