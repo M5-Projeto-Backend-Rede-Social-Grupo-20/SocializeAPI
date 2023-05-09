@@ -5,7 +5,7 @@ from .models import Follow
 from users.serializers import UserSerializer
 
 
-class FollowSerializer(serializers.ModelSerializer):
+class FollowCreateSerializer(serializers.ModelSerializer):
     from_user = UserSerializer(read_only=True)
     to_user = UserSerializer(read_only=True)
 
@@ -26,3 +26,21 @@ class FollowSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("You already followed this user.")
 
         return Follow.objects.create(**validated_data)
+
+
+class FollowersListSerializer(serializers.ModelSerializer):
+    follower = UserSerializer(read_only=True, source="from_user")
+
+    class Meta:
+        model = Follow
+        fields = ["id", "follower", "created_at"]
+        read_only_fields = ["id", "created_at"]
+
+
+class FollowingListSerializer(serializers.ModelSerializer):
+    following = UserSerializer(read_only=True, source="to_user")
+
+    class Meta:
+        model = Follow
+        fields = ["id", "following", "created_at"]
+        read_only_fields = ["id", "created_at"]

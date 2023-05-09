@@ -1,8 +1,17 @@
 from rest_framework import serializers
-from django.shortcuts import get_object_or_404
 
 from .models import Friendship
 from users.serializers import UserSerializer
+
+
+class FriendshipListSerializer(serializers.ModelSerializer):
+    from_user = UserSerializer(read_only=True)
+    to_user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Friendship
+        fields = ["id", "from_user", "to_user", "is_accepted", "created_at"]
+        read_only_fields = ["id", "from_user", "to_user", "created_at"]
 
 
 class FriendshipSerializer(serializers.ModelSerializer):
@@ -49,3 +58,12 @@ class FriendshipSerializer(serializers.ModelSerializer):
             )
 
         return Friendship.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        is_accepted = validated_data.get("is_accepted", instance.is_accepted)
+
+        if is_accepted and instance.is_accepted:
+            raise serializers.ValidationError("Friendship is already accepted")
+        instance.is_accepted = is_accepted
+        instance.save()
+        return instance
