@@ -4,7 +4,7 @@ from .views import (
     FriendshipSelfReceivedPendingView,
     FriendshipView,
     FriendshipUpdateView,
-    FriendshipDestroyAPIView,
+    FriendshipDestroyView,
 )
 
 urlpatterns = [
@@ -30,7 +30,7 @@ urlpatterns = [
     ),
     path(
         "friendships/<uuid:user_id>/reject/",
-        FriendshipDestroyAPIView.as_view(),
+        FriendshipDestroyView.as_view(),
         name="friendship-request-reject",
     ),
 ]
