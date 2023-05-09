@@ -9,27 +9,28 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("friendships", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ("posts", "0001_initial"),
+        ("likes", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="friendship",
-            name="from_user",
+            model_name="like",
+            name="liked_by",
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
-                related_name="friendship_sent",
+                related_name="likes",
                 to=settings.AUTH_USER_MODEL,
             ),
         ),
         migrations.AddField(
-            model_name="friendship",
-            name="to_user",
+            model_name="like",
+            name="post",
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
-                related_name="friendship_received",
-                to=settings.AUTH_USER_MODEL,
+                related_name="likes",
+                to="posts.post",
             ),
         ),
     ]

@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name="Follow",
+            name="Comment",
             fields=[
                 (
                     "id",
@@ -22,6 +22,7 @@ class Migration(migrations.Migration):
                         serialize=False,
                     ),
                 ),
+                ("content", models.TextField()),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
             ],
             options={
