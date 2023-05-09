@@ -30,10 +30,10 @@ class FriendshipSelfReceivedPendingView(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return Friendship.objects.filter(to=user, is_accepted=False)
+        return Friendship.objects.filter(to_user=user, is_accepted=False)
 
 
-class FriendshipView(generics.CreateAPIView):
+class FriendshipView(generics.ListCreateAPIView):
     serializer_class = FriendshipSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [permissions.IsAuthenticated]
@@ -41,6 +41,12 @@ class FriendshipView(generics.CreateAPIView):
     def get_object(self):
         obj = get_object_or_404(User, id=self.kwargs["user_id"])
         return obj
+
+    def get_queryset(self):
+        user = self.get_object()
+        return Friendship.objects.filter(
+            Q(from_user=user) | Q(to_user=user), is_accepted=True
+        )
 
     def perform_create(self, serializer):
         user = self.get_object()
@@ -64,12 +70,14 @@ class FriendshipUpdateView(generics.UpdateAPIView):
             from_user=to_user, to_user=from_user, is_accepted=False
         ).first()
         if not friendship:
-            raise serializers.ValidationError("Friendship not found.")
+            raise serializers.ValidationError(
+                "Friendship not found or you trying to accept your own request."
+            )
         friendship.is_accepted = True
         friendship.save()
 
 
-class FriendshipDestroyAPIView(generics.UpdateAPIView):
+class FriendshipDestroyView(generics.DestroyAPIView):
     serializer_class = FriendshipSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [permissions.IsAuthenticated]
@@ -91,5 +99,5 @@ class FriendshipDestroyAPIView(generics.UpdateAPIView):
         if not friendship_me_to_user and not friendship_user_to_me:
             raise serializers.ValidationError("Friendship not found.")
         if friendship_me_to_user:
-            friendship_me_to_user.delete()
-        friendship_user_to_me.delete()
+            return friendship_me_to_user.delete()
+        return friendship_user_to_me.delete()
