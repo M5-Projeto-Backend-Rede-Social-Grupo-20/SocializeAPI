@@ -1,7 +1,5 @@
-from django.forms import ValidationError
-from rest_framework import generics, mixins, views, serializers
+from rest_framework import generics, serializers
 from rest_framework import permissions
-from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.db.models import Q
@@ -71,10 +69,12 @@ class FriendshipUpdateView(generics.UpdateAPIView):
         ).first()
         if not friendship:
             raise serializers.ValidationError(
-                "Friendship not found or you trying to accept your own request."
+                "Friendship not found or you already have a friendship with this user."
             )
+
         friendship.is_accepted = True
         friendship.save()
+        serializer.instance = friendship
 
 
 class FriendshipDestroyView(generics.DestroyAPIView):
@@ -96,8 +96,17 @@ class FriendshipDestroyView(generics.DestroyAPIView):
         friendship_user_to_me = Friendship.objects.filter(
             from_user=to_user, to_user=from_user, is_accepted=True
         ).first()
-        if not friendship_me_to_user and not friendship_user_to_me:
+        friendship_user_to_me_reject = Friendship.objects.filter(
+            from_user=to_user, to_user=from_user, is_accepted=False
+        ).first()
+        if (
+            not friendship_me_to_user
+            and not friendship_user_to_me
+            and not friendship_user_to_me_reject
+        ):
             raise serializers.ValidationError("Friendship not found.")
         if friendship_me_to_user:
             return friendship_me_to_user.delete()
-        return friendship_user_to_me.delete()
+        elif friendship_user_to_me:
+            friendship_user_to_me.delete()
+        return friendship_user_to_me_reject.delete()

@@ -47,7 +47,7 @@ class FollowView(generics.CreateAPIView, generics.DestroyAPIView):
 
     def perform_destroy(self, instance):
         user = self.get_object()
-        follow = user.followers.filter(from_user=self.request.user).first()
+        follow = user.followers.all().filter(from_user=self.request.user).first()
         if not follow:
             raise serializers.ValidationError("You not follow this user.")
         follow.delete()
