@@ -1,7 +1,5 @@
-from django.forms import ValidationError
-from rest_framework import generics, mixins, views, serializers
+from rest_framework import generics, serializers
 from rest_framework import permissions
-from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.db.models import Q
